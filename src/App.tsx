@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Header } from './components/Header';
 import { HowToModal } from './components/HowToModal';
+import { InstallToast } from './components/InstallToast';
 import { PaymentForm } from './components/PaymentForm';
 import { QRDisplay } from './components/QRDisplay';
 import { PaymentFormValues, SplitResult, SplitQRItem } from './types';
@@ -186,6 +187,7 @@ export default function App() {
         onOpenInfo={() => setIsHowToOpen(true)}
       />
       <HowToModal open={isHowToOpen} onClose={() => setIsHowToOpen(false)} />
+      <InstallToast />
 
       <main className="relative z-10 flex-1 max-w-md w-full mx-auto px-4 pt-8 sm:pt-10 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {isGenerating && !splitResult ? (

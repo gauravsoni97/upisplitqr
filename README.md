@@ -19,6 +19,7 @@ The app is in **English**. Tap the **i** icon in the navbar for a short how-to.
 - Mark each part as **paid** and track how much is left
 - View QRs **one by one** or **all at once**
 - Share, save, or copy each UPI payment link
+- Install as a phone app from the mobile toast (Add to Home Screen)
 - Open a shared link with `upi` and `amount` to generate QRs instantly
 - Maximum total: **₹1,00,000** (NPCI UPI limit)
 
