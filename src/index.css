@@ -93,6 +93,17 @@ input[type="number"] {
   animation: gradient-drift 20s ease-in-out infinite alternate-reverse;
 }
 
+.qr-reader video,
+.qr-reader canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+
+.qr-reader img {
+  display: none;
+}
+
 @keyframes gradient-drift {
   0% {
     transform: translate3d(0, 0, 0) scale(1);

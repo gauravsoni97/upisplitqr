@@ -1,36 +1,66 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowRight, Zap, AlertTriangle, Building2, AtSign, IndianRupee, LoaderCircle } from 'lucide-react';
-import { calculateSplits, formatINR, getSplitSummary, MAX_UPI_AMOUNT } from '../utils/upi';
-import { PaymentFormValues } from '../types';
+import { ArrowDownLeft, ArrowRight, ArrowUpRight, Camera, Copy, Check, Zap, AlertTriangle, Building2, AtSign, IndianRupee, LoaderCircle } from 'lucide-react';
+import { calculateSplits, formatINR, getSplitSummary, MAX_UPI_AMOUNT, ParsedUpiQr } from '../utils/upi';
+import { PaymentFormValues, PaymentMode } from '../types';
+import { QrScannerModal } from './QrScannerModal';
+import { getHistory } from '../utils/history';
 
 interface PaymentFormProps {
   onGenerate: (values: PaymentFormValues) => void;
   isLoading?: boolean;
 }
 
-const COMMON_HANDLES = ['@okaxis', '@oksbi', '@paytm', '@ybl'];
+const COMMON_HANDLES = ['@okaxis', '@oksbi', '@paytm', '@ybl', '@okhdfcbank', '@axl'];
 const QUICK_AMOUNTS = [1999, 2500, 3000, 5000];
 const LAST_UPI_KEY = 'last_upi_id';
+const LAST_PAYEE_KEY = 'last_payee_upi_id';
+const LAST_MODE_KEY = 'last_payment_mode';
 const STALE_UPI_IDS = new Set(['gauravsoni@upi']);
 
-const getSavedUpiId = () => {
+const readStorage = (key: string) => {
   if (typeof window === 'undefined') return '';
   try {
-    const saved = localStorage.getItem(LAST_UPI_KEY)?.trim() || '';
-    if (!saved || STALE_UPI_IDS.has(saved.toLowerCase())) {
-      localStorage.removeItem(LAST_UPI_KEY);
-      return '';
-    }
-    return saved;
+    return localStorage.getItem(key)?.trim() || '';
   } catch {
     return '';
   }
 };
 
+const writeStorage = (key: string, value: string) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Ignore private-mode / storage failures
+  }
+};
+
+const getSavedUpiId = (key: string) => {
+  const saved = readStorage(key);
+  if (!saved || STALE_UPI_IDS.has(saved.toLowerCase())) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Ignore
+    }
+    return '';
+  }
+  return saved;
+};
+
+const getSavedMode = (): PaymentMode => (readStorage(LAST_MODE_KEY) === 'receive' ? 'receive' : 'send');
+
 export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading }) => {
-  const [upiId, setUpiId] = useState<string>(getSavedUpiId);
+  const [mode, setMode] = useState<PaymentMode>(getSavedMode);
+  const [upiId, setUpiId] = useState<string>(() =>
+    getSavedUpiId(getSavedMode() === 'send' ? LAST_PAYEE_KEY : LAST_UPI_KEY)
+  );
+  const [payeeName, setPayeeName] = useState<string>('');
   const [amountInput, setAmountInput] = useState<string>('2500');
+  const [note, setNote] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [history] = useState(() => getHistory());
 
   const numericAmount = parseFloat(amountInput) || 0;
   const currentHandle = upiId.includes('@') ? `@${upiId.split('@')[1]}` : '';
@@ -43,14 +73,38 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading 
   }, [numericAmount]);
 
   useEffect(() => {
+    writeStorage(LAST_MODE_KEY, mode);
     const cleanUpi = upiId.trim();
     if (!cleanUpi) return;
+    writeStorage(mode === 'send' ? LAST_PAYEE_KEY : LAST_UPI_KEY, cleanUpi);
+  }, [upiId, mode]);
+
+  const switchMode = (nextMode: PaymentMode) => {
+    if (nextMode === mode) return;
+    setError('');
+    setPayeeName('');
+    setMode(nextMode);
+    setUpiId(getSavedUpiId(nextMode === 'send' ? LAST_PAYEE_KEY : LAST_UPI_KEY));
+  };
+
+  const handleCopyUpi = async () => {
+    if (!upiId.trim()) return;
     try {
-      localStorage.setItem(LAST_UPI_KEY, cleanUpi);
+      await navigator.clipboard.writeText(upiId.trim());
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
     } catch {
-      // Ignore private-mode / storage failures
+      setError('Could not copy UPI ID');
     }
-  }, [upiId]);
+  };
+
+  const handleScannedQr = (parsed: ParsedUpiQr) => {
+    setError('');
+    setUpiId(parsed.upiId);
+    if (parsed.payeeName) setPayeeName(parsed.payeeName);
+    if (parsed.amount) setAmountInput(String(parsed.amount));
+    setScannerOpen(false);
+  };
 
   const handleAppendHandle = (handle: string) => {
     const username = upiId.includes('@') ? upiId.substring(0, upiId.indexOf('@')) : upiId.trim();
@@ -69,7 +123,7 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading 
 
     const cleanUpi = upiId.trim();
     if (!cleanUpi) {
-      setError('Enter your UPI ID');
+      setError(mode === 'send' ? 'Enter or scan the UPI ID you want to pay' : 'Enter or scan your UPI ID');
       return;
     }
 
@@ -90,30 +144,70 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading 
 
     onGenerate({
       upiId: cleanUpi,
-      payeeName: '',
+      payeeName,
       totalAmount: numericAmount,
       maxCap: 1999,
-      customNote: 'Payment',
+      customNote: note.trim() || (mode === 'send' ? 'UPI payment' : 'Payment'),
+      mode,
     });
   };
+
+  const isSend = mode === 'send';
 
   return (
     <div className="w-full max-w-md mx-auto animate-fade-up">
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-lg shadow-slate-200/80 space-y-5">
         <div>
+          <div className="grid grid-cols-2 gap-1 p-1 rounded-2xl bg-slate-100 mb-4">
+            <button
+              type="button"
+              onClick={() => switchMode('send')}
+              className={`min-h-10 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer ${
+                isSend ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'
+              }`}
+            >
+              <ArrowUpRight className="w-4 h-4" />
+              Send
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode('receive')}
+              className={`min-h-10 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer ${
+                !isSend ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'
+              }`}
+            >
+              <ArrowDownLeft className="w-4 h-4" />
+              Receive
+            </button>
+          </div>
           <h2 className="text-lg font-extrabold tracking-tight text-slate-900">
-            Split UPI payments above ₹1,999
+            {isSend ? 'Scan a QR and send any amount' : 'Split UPI payments above ₹1,999'}
           </h2>
           <p className="mt-1 text-sm font-medium text-emerald-700">
-            One amount. Multiple QRs. Paid in minutes.
+            {isSend
+              ? 'Pay someone by scanning their UPI QR. Big amounts split automatically.'
+              : 'Collect money with multiple QRs. Paid in minutes.'}
           </p>
         </div>
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="upi-id-input" className="text-sm font-bold text-slate-800">
-              Your UPI ID
+              {isSend ? 'Pay to UPI ID' : 'Your UPI ID'}
             </label>
-            <span className="text-[11px] text-slate-400 font-medium">Where money is received</span>
+            {upiId.includes('@') ? (
+              <button
+                type="button"
+                onClick={handleCopyUpi}
+                className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 cursor-pointer inline-flex items-center gap-1"
+              >
+                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                {copied ? 'Copied' : 'Copy'}
+              </button>
+            ) : (
+              <span className="text-[11px] text-slate-400 font-medium">
+                {isSend ? 'Scan their QR or type it' : 'Scan your QR or type it'}
+              </span>
+            )}
           </div>
 
           <div className="relative">
@@ -131,12 +225,24 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading 
                 setError('');
                 setUpiId(e.target.value.toLowerCase().trim());
               }}
-              placeholder="gauravsoni8414@oksbi"
-              className="w-full pl-10 pr-3.5 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 outline-none text-slate-900 font-semibold text-sm placeholder:text-slate-400 placeholder:font-medium"
+              placeholder="upiname@oksbi"
+              className="w-full pl-10 pr-12 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 outline-none text-slate-900 font-semibold text-sm placeholder:text-slate-400 placeholder:font-medium"
               required
             />
+            <button
+              type="button"
+              onClick={() => setScannerOpen(true)}
+              aria-label="Scan UPI QR"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 inline-flex items-center justify-center rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+            >
+              <Camera className="w-4 h-4" />
+            </button>
           </div>
-
+          {payeeName && (
+            <p className="mt-1.5 text-xs font-semibold text-slate-500">
+              Name on QR: {payeeName}
+            </p>
+          )}
           <div className="flex items-center gap-2 mt-2 overflow-x-auto chip-scroll">
             {COMMON_HANDLES.map((handle) => (
               <button
@@ -200,6 +306,21 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading 
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="note-input" className="text-sm font-bold text-slate-800">
+            Note <span className="font-medium text-slate-400">(optional)</span>
+          </label>
+          <input
+            id="note-input"
+            type="text"
+            maxLength={50}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Rent, dinner, client payment"
+            className="mt-1.5 w-full px-3.5 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 outline-none text-slate-900 font-semibold text-sm placeholder:text-slate-400 placeholder:font-medium"
+          />
         </div>
 
         {summary.exceedsLimit && (
@@ -332,14 +453,52 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ onGenerate, isLoading 
                 {summary.exceedsLimit
                   ? `Amount exceeds UPI limit (max ${formatINR(MAX_UPI_AMOUNT)})`
                   : splits.length > 1
-                  ? `Generate ${splits.length} QRs · ${formatINR(numericAmount)}`
-                  : `Generate QR · ${formatINR(numericAmount)}`}
+                  ? `${isSend ? 'Pay' : 'Generate'} ${splits.length} QRs · ${formatINR(numericAmount)}`
+                  : `${isSend ? 'Pay' : 'Generate QR'} · ${formatINR(numericAmount)}`}
               </span>
               {!summary.exceedsLimit && <ArrowRight className="w-4 h-4" />}
             </>
           )}
         </button>
       </form>
+
+      {history.length > 0 && (
+        <div className="mt-4 bg-white rounded-3xl p-4 border border-slate-200/80 shadow-sm">
+          <p className="text-sm font-extrabold text-slate-900 mb-2.5">Recent activity</p>
+          <ul className="space-y-2">
+            {history.slice(0, 5).map((item) => (
+              <li key={item.id} className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-slate-50/80 px-3 py-2.5">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-800 truncate">
+                    {item.mode === 'send' ? 'Sent' : 'Received'} · {formatINR(item.amount)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError('');
+                    setMode(item.mode);
+                    setUpiId(item.upiId);
+                    setPayeeName(item.payeeName);
+                    setAmountInput(String(item.amount));
+                    setNote(item.note === 'Payment' || item.note === 'UPI payment' ? '' : item.note);
+                    writeStorage(LAST_MODE_KEY, item.mode);
+                  }}
+                  className="shrink-0 min-h-8 px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-emerald-700 hover:bg-emerald-50 cursor-pointer"
+                >
+                  Repeat
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <QrScannerModal
+        open={scannerOpen}
+        title={isSend ? 'Scan QR to send' : 'Scan your UPI QR'}
+        onClose={() => setScannerOpen(false)}
+        onScan={handleScannedQr}
+      />
     </div>
   );
 };

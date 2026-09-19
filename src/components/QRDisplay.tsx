@@ -7,9 +7,10 @@ import {
   CheckCircle2, 
   Image as ImageIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageCircle
 } from 'lucide-react';
-import { SplitQRItem } from '../types';
+import { PaymentMode, SplitQRItem } from '../types';
 import { formatINR } from '../utils/upi';
 
 interface QRDisplayProps {
@@ -19,6 +20,8 @@ interface QRDisplayProps {
   onTogglePaid: (id: string) => void;
   onReset: () => void;
   isSharedView?: boolean;
+  mode?: PaymentMode;
+  note?: string;
 }
 
 export const QRDisplay: React.FC<QRDisplayProps> = ({
@@ -28,7 +31,10 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
   onTogglePaid,
   onReset,
   isSharedView,
+  mode = 'receive',
+  note,
 }) => {
+  const isSend = mode === 'send';
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [showBoth, setShowBoth] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -103,6 +109,14 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
     handleDownload(item);
   };
 
+  const handleShareWhatsApp = () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?upi=${encodeURIComponent(upiId)}&amount=${totalAmount}`;
+    const text = isSend
+      ? `Paying ${formatINR(totalAmount)} to ${upiId}${note ? ` (${note})` : ''} via UPI Splitter.`
+      : `Please pay ${formatINR(totalAmount)} to ${upiId}${note ? ` for ${note}` : ''}. Open this link to get the split QRs:\n${shareUrl}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+  };
+
   const handleDownloadAllQrs = async () => {
     showToast(`Downloading all ${items.length} QR images...`);
     for (let i = 0; i < items.length; i++) {
@@ -131,17 +145,22 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wide">
-              {isSharedView ? 'Shared payment' : 'Collecting'}
+              {isSharedView ? 'Shared payment' : isSend ? 'Sending' : 'Collecting'}
             </p>
             <p className="text-xl font-extrabold text-slate-900 tracking-tight">
               {formatINR(totalAmount)}
             </p>
             <p className="mt-0.5 text-xs text-slate-500 font-medium truncate max-w-[210px]">
-              To {upiId}
+              {isSend ? 'Paying' : 'To'} {upiId}
             </p>
+            {note && note !== 'Payment' && note !== 'UPI payment' && (
+              <p className="mt-0.5 text-xs text-emerald-700 font-semibold truncate max-w-[210px]">
+                {note}
+              </p>
+            )}
           </div>
           <div className="text-right">
-            <p className="text-[11px] text-slate-500 font-semibold">Left to collect</p>
+            <p className="text-[11px] text-slate-500 font-semibold">{isSend ? 'Left to pay' : 'Left to collect'}</p>
             <p className={`text-lg font-extrabold ${allPaid ? 'text-emerald-600' : 'text-slate-900'}`}>
               {formatINR(remainingAmount)}
             </p>
@@ -150,6 +169,12 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
             </p>
           </div>
         </div>
+
+        {isSend && (
+          <p className="mt-3 text-xs text-emerald-800 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2 font-medium">
+            Open each QR in GPay, PhonePe, or Paytm to send that part.
+          </p>
+        )}
 
         <div className="mt-3">
           <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -205,8 +230,8 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
           <div className="flex items-center gap-2.5 text-left">
             <CheckCircle2 className="w-6 h-6 text-white shrink-0" />
             <div>
-              <div className="font-bold text-sm leading-tight">All payments received</div>
-              <div className="text-[11px] text-emerald-100">Total {formatINR(totalAmount)} collected</div>
+              <div className="font-bold text-sm leading-tight">{isSend ? 'All payments sent' : 'All payments received'}</div>
+              <div className="text-[11px] text-emerald-100">Total {formatINR(totalAmount)} {isSend ? 'paid' : 'collected'}</div>
             </div>
           </div>
           <button
@@ -379,6 +404,15 @@ export const QRDisplay: React.FC<QRDisplayProps> = ({
               </div>
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={handleShareWhatsApp}
+            className="w-full min-h-11 rounded-2xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold cursor-pointer inline-flex items-center justify-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            {isSend ? 'Share on WhatsApp' : 'Ask on WhatsApp'}
+          </button>
 
           <div className="grid grid-cols-4 gap-1.5 pt-0.5">
             <button

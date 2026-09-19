@@ -5,7 +5,7 @@ import { HowToModal } from './components/HowToModal';
 import { InstallToast } from './components/InstallToast';
 import { PaymentForm } from './components/PaymentForm';
 import { QRDisplay } from './components/QRDisplay';
-import { PaymentFormValues, SplitResult, SplitQRItem } from './types';
+import { PaymentFormValues, PaymentMode, SplitResult, SplitQRItem } from './types';
 import { 
   calculateSplits, 
   buildUpiDeepLink, 
@@ -13,6 +13,7 @@ import {
   playPaymentSuccessSound,
   MAX_UPI_AMOUNT 
 } from './utils/upi';
+import { addHistory } from './utils/history';
 
 export default function App() {
   const [splitResult, setSplitResult] = useState<SplitResult | null>(null);
@@ -20,7 +21,13 @@ export default function App() {
   const [isSharedView, setIsSharedView] = useState<boolean>(false);
   const [isHowToOpen, setIsHowToOpen] = useState<boolean>(false);
 
-  const generateSplits = async (upiId: string, rawAmount: number, note: string = 'Payment') => {
+  const generateSplits = async (
+    upiId: string,
+    rawAmount: number,
+    note: string = 'Payment',
+    mode: PaymentMode = 'receive',
+    payeeName: string = ''
+  ) => {
     setIsGenerating(true);
 
     try {
@@ -32,12 +39,12 @@ export default function App() {
         splits.map(async (chunkAmount, idx) => {
           const index = idx + 1;
           const chunkNote = totalChunks > 1
-            ? `Part ${index}/${totalChunks}`
+            ? `${note} · Part ${index}/${totalChunks}`
             : note;
 
           const upiUrl = buildUpiDeepLink({
             upiId,
-            payeeName: '',
+            payeeName,
             amount: chunkAmount,
             note: chunkNote,
           });
@@ -61,7 +68,9 @@ export default function App() {
         totalAmount: amount,
         maxCap: 1999,
         upiId,
-        payeeName: '',
+        payeeName,
+        mode,
+        note,
         chunks,
         createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       });
@@ -78,7 +87,16 @@ export default function App() {
       : parseFloat(values.totalAmount) || 0;
     
     setIsSharedView(false);
-    await generateSplits(values.upiId, amount, values.customNote || 'Payment');
+    const mode = values.mode || 'receive';
+    const note = values.customNote?.trim() || (mode === 'send' ? 'UPI payment' : 'Payment');
+    addHistory({
+      mode,
+      upiId: values.upiId,
+      payeeName: values.payeeName || '',
+      amount,
+      note,
+    });
+    await generateSplits(values.upiId, amount, note, mode, values.payeeName || '');
   };
 
   // Automatically check for shareable URL query parameters on initial page load
@@ -119,7 +137,7 @@ export default function App() {
 
         if (cleanUpi && cleanUpi.includes('@') && parsedAmount > 0) {
           setIsSharedView(true);
-          generateSplits(cleanUpi, parsedAmount, 'Payment');
+          generateSplits(cleanUpi, parsedAmount, 'Payment', 'receive');
         }
       }
     } catch (err) {
@@ -209,6 +227,8 @@ export default function App() {
             onTogglePaid={handleTogglePaid}
             onReset={handleReset}
             isSharedView={isSharedView}
+            mode={splitResult.mode}
+            note={splitResult.note}
           />
         )}
       </main>

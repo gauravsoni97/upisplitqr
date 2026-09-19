@@ -3,6 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHGKNZQY1R"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QHGKNZQY1R');
+    </script>
     <meta name="theme-color" content="#059669" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -11,20 +19,26 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-    <title>UPI Splitter – ₹2000 se upar ki payment ko multiple QR mein split karo</title>
-    <meta name="description" content="Free UPI Splitter. ₹1,999 se badi UPI payment ko multiple QR codes mein auto-split karo. GPay, PhonePe, Paytm se scan karke collect karo. Max ₹1,00,000." />
-    <meta name="keywords" content="UPI split QR, UPI payment split, QR above 2000, GPay QR generator, PhonePe split payment, UPI multiple QR, collect UPI payment" />
-    <meta name="robots" content="index, follow" />
+    <title>UPI Splitter – Send or receive UPI payments above ₹1,999 with split QR codes</title>
+    <meta name="description" content="Free UPI Splitter to send and receive large UPI payments. Auto-split amounts above ₹1,999 into multiple QR codes for GPay, PhonePe, and Paytm. Scan a UPI QR or generate collect QRs. Max ₹1,00,000." />
+    <meta name="keywords" content="UPI split QR, send UPI payment, receive UPI payment, UPI QR scanner, QR above 2000, GPay QR generator, PhonePe split payment, collect UPI payment" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="author" content="UPI Splitter" />
+    <meta name="application-name" content="UPI Splitter" />
+    <meta name="geo.region" content="IN" />
     <link rel="canonical" href="https://gauravsoni97.github.io/upisplitqr/" />
-    <meta property="og:title" content="UPI Splitter – Split large UPI payments into multiple QR codes" />
-    <meta property="og:description" content="Auto-split any UPI amount above ₹1,999 into scan-ready QR codes for GPay, PhonePe, and Paytm." />
+    <meta property="og:site_name" content="UPI Splitter" />
+    <meta property="og:title" content="UPI Splitter – Send or receive large UPI payments with split QRs" />
+    <meta property="og:description" content="Auto-split any UPI amount above ₹1,999 into scan-ready QR codes. Scan to pay or generate QRs to collect." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://gauravsoni97.github.io/upisplitqr/" />
     <meta property="og:locale" content="en_IN" />
+    <meta property="og:image" content="https://gauravsoni97.github.io/upisplitqr/icons/icon-512.png" />
+    <meta property="og:image:alt" content="UPI Splitter app icon" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="UPI Splitter" />
-    <meta name="twitter:description" content="Split large UPI payments into multiple QR codes capped at ₹1,999." />
+    <meta name="twitter:title" content="UPI Splitter – Split large UPI payments into QR codes" />
+    <meta name="twitter:description" content="Send or receive UPI amounts above ₹1,999 with auto-split QR codes." />
+    <meta name="twitter:image" content="https://gauravsoni97.github.io/upisplitqr/icons/icon-512.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -41,20 +55,59 @@
           "price": "0",
           "priceCurrency": "INR"
         },
-        "description": "Generate auto-split UPI payment QR codes capped at ₹1,999 for GPay, PhonePe, and Paytm."
+        "description": "Send or receive large UPI payments by splitting them into QR codes capped at ₹1,999 for GPay, PhonePe, and Paytm.",
+        "featureList": [
+          "Send money by scanning a UPI QR",
+          "Receive money with auto-split collect QRs",
+          "Split amounts above ₹1,999",
+          "Works with GPay, PhonePe, and Paytm"
+        ]
       }
     </script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "HowTo",
-        "name": "How to split a UPI payment into multiple QR codes",
-        "description": "Use UPI Splitter to collect amounts above ₹1,999 with multiple scan-and-pay codes.",
+        "name": "How to send or receive a large UPI payment with split QR codes",
+        "description": "Use UPI Splitter to send or collect amounts above ₹1,999 with multiple scan-and-pay codes.",
         "step": [
-          { "@type": "HowToStep", "name": "Enter UPI ID", "text": "Add the receiver UPI ID such as name@oksbi." },
-          { "@type": "HowToStep", "name": "Enter amount", "text": "Type the full amount you want to collect." },
+          { "@type": "HowToStep", "name": "Choose Send or Receive", "text": "Send pays someone after you scan their QR. Receive creates QRs so people can pay you." },
+          { "@type": "HowToStep", "name": "Enter or scan a UPI ID", "text": "Type a UPI ID such as name@oksbi, or scan a UPI QR with the camera." },
+          { "@type": "HowToStep", "name": "Enter amount", "text": "Type the full amount you want to send or collect." },
           { "@type": "HowToStep", "name": "Generate QRs", "text": "The app splits anything above ₹1,999 into multiple QR codes." },
-          { "@type": "HowToStep", "name": "Scan and mark paid", "text": "Ask the payer to scan each QR, then mark every part as paid." }
+          { "@type": "HowToStep", "name": "Pay or mark paid", "text": "Open each QR in a UPI app, then mark every part as paid." }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Why split a UPI payment into multiple QR codes?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Many UPI apps work best with amounts up to ₹1,999 per QR. UPI Splitter breaks a larger total into smaller QRs so the full amount can still be sent or collected."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I scan a UPI QR to send money?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Open Send, tap the camera, scan the other person's UPI QR, enter the amount, and pay with the generated QRs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the maximum UPI amount?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "UPI Splitter supports totals up to ₹1,00,000, which is the common NPCI UPI limit. Use NEFT or RTGS for larger transfers."
+            }
+          }
         ]
       }
     </script>
@@ -63,12 +116,12 @@
     <div id="root"></div>
     <noscript>
       <h1>UPI Splitter</h1>
-      <p>₹1,999 se badi UPI payment ko multiple QR codes mein split karo. GPay, PhonePe aur Paytm se collect karo.</p>
+      <p>Send or receive UPI payments above ₹1,999 by splitting them into multiple QR codes for GPay, PhonePe, and Paytm.</p>
       <ol>
-        <li>Apna UPI ID daalo</li>
-        <li>Total amount enter karo</li>
-        <li>QR generate karo</li>
-        <li>Har QR scan karke pay karo aur paid mark karo</li>
+        <li>Choose Send or Receive</li>
+        <li>Type or scan a UPI ID</li>
+        <li>Enter the total amount</li>
+        <li>Generate QRs and mark each part as paid</li>
       </ol>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>

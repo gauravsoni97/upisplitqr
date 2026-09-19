@@ -10,12 +10,15 @@ export interface SplitQRItem {
   note: string;
 }
 
+export type PaymentMode = 'receive' | 'send';
+
 export interface PaymentFormValues {
   upiId: string;
   payeeName: string;
   totalAmount: number | string;
   maxCap: number;
   customNote: string;
+  mode: PaymentMode;
 }
 
 export interface SplitResult {
@@ -25,4 +28,6 @@ export interface SplitResult {
   payeeName: string;
   chunks: SplitQRItem[];
   createdAt: string;
+  mode: PaymentMode;
+  note: string;
 }

@@ -113,6 +113,78 @@ export function isValidUpiId(upiId: string): boolean {
   return upiRegex.test(upiId.trim());
 }
 
+export interface ParsedUpiQr {
+  upiId: string;
+  payeeName?: string;
+  amount?: number;
+  note?: string;
+}
+
+const VPA_IN_TEXT = /[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}/;
+
+const readParam = (params: URLSearchParams, keys: string[]) => {
+  for (const key of keys) {
+    const value = params.get(key)?.trim();
+    if (value) return value;
+  }
+  return '';
+};
+
+const parseAmount = (raw: string) => {
+  const amount = parseFloat(raw.replace(/[^0-9.]/g, ''));
+  return Number.isFinite(amount) && amount > 0 ? amount : undefined;
+};
+
+/**
+ * Reads a UPI ID (and optional amount/name) from a scanned QR payload.
+ * Supports upi://, intent://, query strings, bare VPAs, and Bharat QR text.
+ */
+export function parseUpiQrPayload(raw: string): ParsedUpiQr | null {
+  const text = raw.trim();
+  if (!text) return null;
+
+  if (isValidUpiId(text)) {
+    return { upiId: text.toLowerCase() };
+  }
+
+  let params = new URLSearchParams();
+  const queryStart = text.indexOf('?');
+  if (queryStart >= 0) {
+    let query = text.slice(queryStart + 1);
+    const hashIndex = query.search(/#Intent|#/i);
+    if (hashIndex >= 0) query = query.slice(0, hashIndex);
+    params = new URLSearchParams(query);
+  } else {
+    try {
+      const normalized = text.replace(/^intent:/i, 'upi:');
+      if (normalized.includes('://')) {
+        params = new URL(normalized).searchParams;
+      }
+    } catch {
+      // Fall through to regex
+    }
+  }
+
+  const upiId = (
+    readParam(params, ['pa', 'vpa', 'upi']) ||
+    text.match(VPA_IN_TEXT)?.[0] ||
+    ''
+  ).toLowerCase();
+
+  if (!isValidUpiId(upiId)) return null;
+
+  const payeeName = readParam(params, ['pn', 'name']);
+  const note = readParam(params, ['tn', 'note']);
+  const amount = parseAmount(readParam(params, ['am', 'amount', 'amt']));
+
+  return {
+    upiId,
+    payeeName: payeeName || undefined,
+    note: note || undefined,
+    amount,
+  };
+}
+
 /**
  * Audio synthesis for pleasant payment chime
  */

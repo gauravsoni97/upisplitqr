@@ -8,24 +8,28 @@ interface HowToModalProps {
 
 const STEPS = [
   {
-    title: 'Enter your UPI ID',
-    text: 'Type the receiver UPI ID, like name@oksbi. Tap handles such as @okaxis, @oksbi, or @paytm to complete it.',
+    title: 'Choose Receive or Send',
+    text: 'Receive creates QRs so people can pay you. Send lets you scan someone else\'s QR and pay them.',
+  },
+  {
+    title: 'Type or scan a UPI ID',
+    text: 'Enter a UPI ID like name@oksbi, or tap the camera to scan a UPI QR. The UPI ID is filled automatically.',
   },
   {
     title: 'Enter the total amount',
-    text: 'Add the full amount you want to collect. Example: ₹2,500. The app shows how many QRs will be created.',
+    text: 'Add the full amount to collect or send. Example: ₹2,500. Amounts above ₹1,999 are split automatically.',
   },
   {
-    title: 'Generate the QRs',
-    text: 'Tap Generate. Anything above ₹1,999 is split automatically. Example: ₹2,500 becomes ₹1,999 + ₹501.',
+    title: 'Generate or pay the QRs',
+    text: 'In Receive, share the QRs. In Send, open each QR in GPay, PhonePe, or Paytm and pay that exact amount.',
   },
   {
-    title: 'Scan and pay',
-    text: 'The payer scans each QR and pays that exact amount. They can also share, save, or open a UPI app.',
+    title: 'Add a note and mark paid',
+    text: 'Optional note goes on the UPI payment. After each part, tap Mark paid. Recent activity lets you repeat a payment.',
   },
   {
-    title: 'Mark as paid',
-    text: 'After each part is paid, tap Mark paid. The progress bar shows collected and remaining amount.',
+    title: 'Share on WhatsApp',
+    text: 'In Receive, send the payment link on WhatsApp so the other person can open the split QRs instantly.',
   },
 ];
 
@@ -76,7 +80,7 @@ export const HowToModal: React.FC<HowToModalProps> = ({ open, onClose }) => {
             </button>
           </div>
           <p className="mt-2 text-sm text-slate-500 leading-relaxed">
-            This tool splits a large UPI payment into smaller QR codes. Each QR is max ₹1,999 so people can pay from GPay, PhonePe, or Paytm.
+            Use Receive to collect money, or Send to pay someone after scanning their UPI QR. Each QR is max ₹1,999.
           </p>
         </div>
 

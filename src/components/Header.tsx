@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ onReset, hasActivePayment, onOpe
               UPI Splitter
             </h1>
             <p className="mt-1 text-xs text-slate-500 font-medium truncate">
-              Split large payments into easy QRs
+              Send or receive with split QRs
             </p>
           </div>
         </div>
