@@ -1,0 +1,6 @@
+{
+  "name": "UPI Split QR Generator",
+  "description": "Generate auto-split UPI payment QR codes capped at ₹1,999 with step-by-step payment tracking and mobile-first interface.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
