@@ -1,32 +1,36 @@
-# UPI Split QR
+# UPI Splitter
 
-Generate UPI payment QR codes and automatically **split large payments** into smaller parts.
+A simple web app to **collect large UPI payments** by splitting them into multiple scan-ready QR codes.
 
-Many UPI apps and merchants work best with amounts up to **₹1,999 per QR**. If someone needs to pay more than that, this app breaks the total into multiple scan-and-pay QRs so the full amount can still be collected.
+Many UPI apps work best with amounts up to **₹1,999 per QR**. UPI Splitter breaks a bigger total into smaller QRs so the full amount can still be collected from GPay, PhonePe, Paytm, and other UPI apps.
 
 **Example:** ₹2,500 becomes two QRs — ₹1,999 + ₹501.
 
-## What you can do
+The app is in **English**. Tap the **i** icon in the navbar for a short how-to.
 
-- Enter a UPI ID and a total amount
-- Auto-split the amount into QRs of **₹1,999 or less**
+## Features
+
+- Enter a UPI ID and the total amount to collect
+- Auto-split anything above **₹1,999** into multiple QRs
 - Show a **single QR** when the amount is already under the cap
-- Preview the split before generating (how many QRs, and each amount)
-- Scan and pay from **GPay, PhonePe, Paytm**, and other UPI apps
-- Mark each part as **paid** and track progress until the full amount is collected
+- Live split preview before you generate
+- Quick UPI handles: `@okaxis`, `@oksbi`, `@paytm`, `@ybl`
+- Scan and pay from GPay, PhonePe, Paytm, and other UPI apps
+- Mark each part as **paid** and track how much is left
 - View QRs **one by one** or **all at once**
-- Share, download, or copy each UPI payment link
-- Open a shared link with `upi` and `amount` in the URL to generate QRs instantly
+- Share, save, or copy each UPI payment link
+- Open a shared link with `upi` and `amount` to generate QRs instantly
+- Maximum total: **₹1,00,000** (NPCI UPI limit)
 
-## How payment split works
+## How to use
 
-1. Enter the receiver UPI ID (for example `name@oksbi` or `9876543210@paytm`).
+1. Enter the receiver UPI ID (for example `gauravsoni8414@oksbi`).
 2. Enter the total amount to collect.
-3. The app splits anything above ₹1,999 into multiple QRs.
-4. The payer scans each QR and pays that exact amount.
-5. Mark each QR as paid until the full payment is received.
+3. Tap **Generate**. Amounts above ₹1,999 are split automatically.
+4. Ask the payer to scan each QR and pay that exact amount.
+5. Tap **Mark paid** after each part until the full amount is collected.
 
-Maximum supported total is **₹1,00,000** (NPCI UPI limit). Larger transfers should use NEFT/RTGS.
+For larger transfers, use NEFT/RTGS.
 
 ## Run locally
 
@@ -46,8 +50,12 @@ npm run preview
 
 ## Shared payment links
 
-You can open the app with query parameters so QRs generate automatically:
+Open the app with query parameters so QRs generate automatically:
 
 ```
 /?upi=name@oksbi&amount=2500
 ```
+
+## Repo
+
+[github.com/gauravsoni97/upisplitqr](https://github.com/gauravsoni97/upisplitqr)

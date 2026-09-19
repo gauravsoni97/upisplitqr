@@ -1,1 +1,106 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  min-height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100%;
+  font-family: var(--font-sans);
+  background: #ffffff;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.chip-scroll {
+  scrollbar-width: none;
+}
+
+.chip-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.3s ease-out both;
+}
+
+.page-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 640px at 14% 16%, rgba(236, 253, 245, 0.16), transparent 62%),
+    radial-gradient(860px 580px at 86% 20%, rgba(240, 253, 250, 0.14), transparent 60%),
+    radial-gradient(920px 640px at 50% 94%, rgba(247, 254, 231, 0.12), transparent 64%),
+    linear-gradient(180deg, #ffffff 0%, #fefffe 100%);
+}
+
+.page-gradient::before,
+.page-gradient::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(70px);
+  will-change: transform;
+}
+
+.page-gradient::before {
+  width: min(58vw, 520px);
+  height: min(58vw, 520px);
+  top: -8%;
+  left: -6%;
+  background: rgba(236, 253, 245, 0.14);
+  animation: gradient-drift 16s ease-in-out infinite alternate;
+}
+
+.page-gradient::after {
+  width: min(64vw, 620px);
+  height: min(64vw, 620px);
+  right: -10%;
+  bottom: -12%;
+  background: rgba(240, 253, 250, 0.12);
+  animation: gradient-drift 20s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes gradient-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(8%, 10%, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(-6%, 16%, 0) scale(0.94);
+  }
+}

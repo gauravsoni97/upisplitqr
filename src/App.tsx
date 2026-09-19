@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Header } from './components/Header';
+import { HowToModal } from './components/HowToModal';
 import { PaymentForm } from './components/PaymentForm';
 import { QRDisplay } from './components/QRDisplay';
 import { PaymentFormValues, SplitResult, SplitQRItem } from './types';
@@ -16,6 +17,7 @@ export default function App() {
   const [splitResult, setSplitResult] = useState<SplitResult | null>(null);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [isSharedView, setIsSharedView] = useState<boolean>(false);
+  const [isHowToOpen, setIsHowToOpen] = useState<boolean>(false);
 
   const generateSplits = async (upiId: string, rawAmount: number, note: string = 'Payment') => {
     setIsGenerating(true);
@@ -162,7 +164,7 @@ export default function App() {
         particleCount: willCompleteAll ? 90 : 40,
         spread: 60,
         origin: { y: 0.65 },
-        colors: ['#10b981', '#059669', '#3b82f6', '#f59e0b'],
+        colors: ['#10b981', '#059669', '#14b8a6', '#f8fafc'],
       });
     }
   };
@@ -176,14 +178,23 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col antialiased">
+    <div className="relative min-h-dvh text-slate-900 flex flex-col antialiased">
+      <div className="page-gradient" aria-hidden="true" />
       <Header 
         hasActivePayment={!!splitResult} 
-        onReset={handleReset} 
+        onReset={handleReset}
+        onOpenInfo={() => setIsHowToOpen(true)}
       />
+      <HowToModal open={isHowToOpen} onClose={() => setIsHowToOpen(false)} />
 
-      <main className="flex-1 max-w-md w-full mx-auto px-4 py-3 sm:py-5 flex flex-col justify-center">
-        {!splitResult ? (
+      <main className="relative z-10 flex-1 max-w-md w-full mx-auto px-4 pt-8 sm:pt-10 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        {isGenerating && !splitResult ? (
+          <div className="animate-fade-up bg-white rounded-3xl border border-slate-200 shadow-lg shadow-slate-200/70 p-8 text-center">
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full border-2 border-emerald-100 border-t-emerald-600 animate-spin" />
+            <h2 className="text-base font-extrabold text-slate-900">Creating payment QRs</h2>
+            <p className="mt-1 text-sm text-slate-500">Splitting the amount and generating scan-ready codes.</p>
+          </div>
+        ) : !splitResult ? (
           <PaymentForm 
             onGenerate={handleGenerateSplits} 
             isLoading={isGenerating} 

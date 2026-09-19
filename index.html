@@ -2,20 +2,68 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>UPI Split QR Generator</title>
-    <meta name="description" content="Generate auto-split UPI payment QR codes capped at ₹1,999 with step-by-step payment tracking and mobile-first interface." />
-    <meta property="og:title" content="UPI Split QR Generator" />
-    <meta property="og:description" content="Generate auto-split UPI payment QR codes capped at ₹1,999 with step-by-step payment tracking and mobile-first interface." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>UPI Splitter – ₹2000 se upar ki payment ko multiple QR mein split karo</title>
+    <meta name="description" content="Free UPI Splitter. ₹1,999 se badi UPI payment ko multiple QR codes mein auto-split karo. GPay, PhonePe, Paytm se scan karke collect karo. Max ₹1,00,000." />
+    <meta name="keywords" content="UPI split QR, UPI payment split, QR above 2000, GPay QR generator, PhonePe split payment, UPI multiple QR, collect UPI payment" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="UPI Splitter" />
+    <link rel="canonical" href="https://gauravsoni97.github.io/upisplitqr/" />
+    <meta property="og:title" content="UPI Splitter – Split large UPI payments into multiple QR codes" />
+    <meta property="og:description" content="Auto-split any UPI amount above ₹1,999 into scan-ready QR codes for GPay, PhonePe, and Paytm." />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:url" content="https://gauravsoni97.github.io/upisplitqr/" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="UPI Splitter" />
+    <meta name="twitter:description" content="Split large UPI payments into multiple QR codes capped at ₹1,999." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "UPI Splitter",
+        "url": "https://gauravsoni97.github.io/upisplitqr/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Android, iOS, Windows",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        },
+        "description": "Generate auto-split UPI payment QR codes capped at ₹1,999 for GPay, PhonePe, and Paytm."
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to split a UPI payment into multiple QR codes",
+        "description": "Use UPI Splitter to collect amounts above ₹1,999 with multiple scan-and-pay codes.",
+        "step": [
+          { "@type": "HowToStep", "name": "Enter UPI ID", "text": "Add the receiver UPI ID such as name@oksbi." },
+          { "@type": "HowToStep", "name": "Enter amount", "text": "Type the full amount you want to collect." },
+          { "@type": "HowToStep", "name": "Generate QRs", "text": "The app splits anything above ₹1,999 into multiple QR codes." },
+          { "@type": "HowToStep", "name": "Scan and mark paid", "text": "Ask the payer to scan each QR, then mark every part as paid." }
+        ]
+      }
+    </script>
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased font-sans min-h-screen">
+  <body class="text-slate-900 antialiased font-sans min-h-dvh">
     <div id="root"></div>
+    <noscript>
+      <h1>UPI Splitter</h1>
+      <p>₹1,999 se badi UPI payment ko multiple QR codes mein split karo. GPay, PhonePe aur Paytm se collect karo.</p>
+      <ol>
+        <li>Apna UPI ID daalo</li>
+        <li>Total amount enter karo</li>
+        <li>QR generate karo</li>
+        <li>Har QR scan karke pay karo aur paid mark karo</li>
+      </ol>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

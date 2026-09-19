@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gauravsoni97.github.io/upisplitqr/sitemap.xml
