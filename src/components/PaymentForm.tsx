@@ -11,11 +11,17 @@ interface PaymentFormProps {
 const COMMON_HANDLES = ['@okaxis', '@oksbi', '@paytm', '@ybl'];
 const QUICK_AMOUNTS = [1999, 2500, 3000, 5000];
 const LAST_UPI_KEY = 'last_upi_id';
+const STALE_UPI_IDS = new Set(['gauravsoni@upi']);
 
 const getSavedUpiId = () => {
   if (typeof window === 'undefined') return '';
   try {
-    return localStorage.getItem(LAST_UPI_KEY)?.trim() || '';
+    const saved = localStorage.getItem(LAST_UPI_KEY)?.trim() || '';
+    if (!saved || STALE_UPI_IDS.has(saved.toLowerCase())) {
+      localStorage.removeItem(LAST_UPI_KEY);
+      return '';
+    }
+    return saved;
   } catch {
     return '';
   }
